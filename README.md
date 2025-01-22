@@ -7,3 +7,11 @@
     <p>curl -fsSL https://ollama.com/install.sh | sh</p>
     <p>ollama pull llama3.2:1b</p>
 </details>
+
+## improvements
+
+[x] clipboard explainer
+[ ] contextual understanding
+[ ] execute commands
+[ ] vision
+[ ] automate everything
