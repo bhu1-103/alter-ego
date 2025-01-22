@@ -1,17 +1,14 @@
 # bhu3, my alter ego
 
 ## Dependencies
-<details>
-    <summary>arch based distros</summary>
-    <p>sudo pacman -S curl dunst</p>
-    <p>curl -fsSL https://ollama.com/install.sh | sh</p>
-    <p>ollama pull llama3.2:1b</p>
-</details>
+`sudo pacman -S curl dunst`
+`curl -fsSL https://ollama.com/install.sh | sh`
+`ollama pull llama3.2:1b`
 
 ## improvements
 
-[x] clipboard explainer
-[ ] contextual understanding
-[ ] execute commands
-[ ] vision
-[ ] automate everything
+- [x] clipboard explainer
+- [ ] contextual understanding
+- [ ] execute commands
+- [ ] vision
+- [ ] automate everything
