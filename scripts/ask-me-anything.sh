@@ -16,7 +16,7 @@ if [ -n "$prompt" ]; then
 		"stream":false
 		}' > ~/dev/cache/response.json
 	jq ".response" ~/dev/cache/response.json >> $logs_dir/$(date +%y-%m-%d)-responses.txt
-	notify-send "alter-ego_says" "$(tail -n 1 $logs_dir/25-01-30-responses.txt)"
+	notify-send "alter-ego_says" "$(tail -n 1 $logs_dir/$(date +%y-%m-%d)-responses.txt)"
 else
 	echo "nani sore.."
 fi
