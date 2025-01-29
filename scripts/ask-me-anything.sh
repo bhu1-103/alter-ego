@@ -7,7 +7,7 @@ touch $logs_dir/responses.txt
 
 model=$(ollama list | tail -n +2 | awk -F " " '{print $1}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "CHOOSE MODEL")
 
-prompt=$(tail -n 5 $logs_dir/prompts.txt | awk -F "Prompt: " '{print $2}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "Jarvis with $model here" -p "ENTER PROMPT")
+prompt=$(tac $logs_dir/prompts.txt | awk -F "Prompt: " '{print $2}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "Jarvis with $model here" -p "ENTER PROMPT")
 
 if [ -n "$prompt" ]; then
 	echo "$(date +%H:%M) | Model: $(printf "%-20s" "$model") | Prompt: $prompt" >> $logs_dir/prompts.txt
