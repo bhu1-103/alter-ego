@@ -6,9 +6,7 @@ touch ~/dev/logs/alter-ego/$(date +%y-%m-%d)-responses.txt
 model=$(ollama list | tail -n +2 | awk -F " " '{print $1}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-7 -p "")
 
 prompt=$(rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-7 -p "Jarvis with $model here")
-echo -n $model >> ~/dev/logs/alter-ego/$(date +%y-%m-%d)-prompts.txt
-echo -n ":" >> ~/dev/logs/alter-ego/$(date +%y-%m-%d)-prompts.txt
-echo $prompt >> ~/dev/logs/alter-ego/$(date +%y-%m-%d)-prompts.txt
+echo "$(date +%H:%M) | Model: $(printf "%-20s" "$model") | Prompt: $prompt" >> ~/dev/logs/alter-ego/$(date +%y-%m-%d)-prompts.txt
 
 if [ -n "$prompt" ]; then
 	curl http://localhost:11434/api/generate -d '{"model": "'$model'",
