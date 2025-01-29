@@ -5,9 +5,9 @@ logs_dir="/home/bhu2/dev/logs/alter-ego"
 touch $logs_dir/prompts.txt
 touch $logs_dir/responses.txt
 
-model=$(ollama list | tail -n +2 | awk -F " " '{print $1}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "")
+model=$(ollama list | tail -n +2 | awk -F " " '{print $1}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "CHOOSE MODEL")
 
-prompt=$(tail -n 5 $logs_dir/prompts.txt | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "Jarvis with $model here")
+prompt=$(tail -n 5 $logs_dir/prompts.txt | awk -F "Prompt: " '{print $2}' | rofi -dmenu -theme $HOME/.config/rofi/launchers/type-7/style-3 -p "Jarvis with $model here" -p "ENTER PROMPT")
 
 if [ -n "$prompt" ]; then
 	echo "$(date +%H:%M) | Model: $(printf "%-20s" "$model") | Prompt: $prompt" >> $logs_dir/prompts.txt
@@ -16,7 +16,7 @@ if [ -n "$prompt" ]; then
 		"stream":false
 		}' > ~/dev/cache/response.json
 	jq ".response" ~/dev/cache/response.json >> $logs_dir/responses.txt
-	notify-send "alter-ego_says" "$(tail -n 1 $logs_dir/responses.txt)"
+	notify-send "alter-ego ($model) says" "$(tail -n 1 $logs_dir/responses.txt)"
 else
 	echo "nani sore.."
 fi
