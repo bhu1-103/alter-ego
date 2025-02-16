@@ -8,6 +8,7 @@
 ## improvements
 
 - [x] clipboard explainer
+- [ ] screenshot explainer
 - [ ] contextual understanding
 - [ ] execute commands
 - [ ] vision
