@@ -15,3 +15,4 @@
 - [ ] execute commands
 - [ ] vision
 - [ ] automate everything
+- [ ] voice in (maybe vosk)
