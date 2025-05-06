@@ -1,6 +1,6 @@
 # bhu3, my alter ego
 
-## Dependencies
+## .Dependencies
 `sudo pacman -S curl dunst`
 
 `curl -fsSL https://ollama.com/install.sh | sh`
