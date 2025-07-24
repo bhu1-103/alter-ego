@@ -17,4 +17,5 @@
 - [ ] vision
 - [ ] automate everything
 - [ ] voice in (maybe vosk)
-- [ ] voice out (maybe kokoro or zonos) (or better, espeak)
+- [x] voice out (maybe kokoro or zonos) (or better, espeak)
+- [ ] custom voice in espeak
