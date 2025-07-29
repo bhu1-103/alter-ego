@@ -12,6 +12,7 @@ from pathlib import Path
 from rapidfuzz import fuzz
 
 MODEL_PATH = Path("~/dev/vosk/vosk-model-small-en-us-0.15").expanduser()
+PIPER_MODEL="libritts"
 SAMPLE_RATE = 16000
 DEVICE = None
 model = Model(str(MODEL_PATH))
@@ -25,8 +26,8 @@ def callback(indata, frames, time, status):
 
 # Start Piper in background
 PIPER_PROCESS = subprocess.Popen(
-    ["./piper/piper", "-m", "./piper/voices/seamine/en_GB-semaine-medium.onnx",
-     "-c", "./piper/voices/seamine/en_GB-semaine-medium.onnx.json"],
+    ["./piper/piper", "-m", f"./piper/voices/{PIPER_MODEL}/model.onnx",
+     "-c", f"./piper/voices/{PIPER_MODEL}/model.onnx.json"],
     stdin=subprocess.PIPE,
     text=True
 )
@@ -129,7 +130,7 @@ try:
                         action()
                     else:
                         print(" No match.")
-                        speak("error 4 o 4")
+                        speak("i don't understand")
                         notify("Command not found.")
 
 except KeyboardInterrupt:
