@@ -24,7 +24,7 @@ def callback(indata, frames, time, status):
 def speak(message):
     subprocess.run(["espeak-ng", message])
 
-def notify(message, title="Jarvis"):
+def notify(message, title="bhu2"):
     subprocess.run(["makoctl", "dismiss"])
     subprocess.run(["notify-send", title, message])
 
@@ -33,6 +33,9 @@ commands = {
     "play music": lambda: (speak("Playing music"), notify("Playing music"), subprocess.run(["mpc", "play"])),
     "pause music": lambda: (speak("Pausing music"), notify("Pausing music"), subprocess.run(["mpc", "pause"])),
     "stop music": lambda: (speak("Stopping music"), notify("Stopping music"), subprocess.run(["mpc", "stop"])),
+    "next song": lambda: (speak("playing next music track"), notify("playing next song"), subprocess.run(["mpc", "next"])),
+    "skip song": lambda: (speak("playing next music track"), notify("playing next song"), subprocess.run(["mpc", "next"])),
+    "previous song": lambda: (speak("playing previous music track"), notify("playing previous song"), subprocess.run(["mpc", "prev"])),
     "show calendar": lambda: (speak("Here is your calendar"), notify(subprocess.getoutput("cal"))),
     "what time is it": lambda: (speak("The time is now"), notify(subprocess.getoutput("date"))),
     "open youtube": lambda: (speak("Opening youtube"), subprocess.run(["firefox", "youtube.com"])),
