@@ -56,7 +56,7 @@ def notify(message, title=AGENT_NAME):
     subprocess.run(["notify-send", title, message])
 
 commands = {
-    "open firefox": lambda: (speak("Opening firefox"), notify("Opening Firefox"), subprocess.Popen(["firefox"])),
+    "open firefox": lambda: (speak("Opening firefox"), notify("Opening Firefox"), subprocess.Popen(["MOZ_ENABLE_WAYLAND=1 firefox"])),
     "open terminal": lambda: (speak("Opening firefox"), notify("Opening Firefox"), subprocess.Popen(["kitty"])),
     "take a screenshot": lambda: (speak("Opening firefox"), notify("Opening Firefox"), subprocess.Popen(["grim"])),
     "play music": lambda: (speak("Playing music"), notify("Playing music"), subprocess.run(["mpc", "play"])),
@@ -68,7 +68,7 @@ commands = {
     "show calendar": lambda: (speak("Here is your calendar"), notify(subprocess.getoutput("cal"))),
     "what time is it": lambda: (speak("The time now is"), notify(subprocess.getoutput("date"))),
     "open youtube": lambda: (speak("Opening youtube"), notify("opening youtube"),subprocess.run(["firefox", "youtube.com"])),
-    "clipboard": lambda: ((lambda summary: [notify(summary, "Clipboard summary"),speak(summary)])(llm_summary(subprocess.getoutput("wl-paste")))),
+    "selection": lambda: ((lambda summary: [notify(summary, "selected text summary"),speak(summary)])(llm_summary(subprocess.getoutput("wl-paste")))),
     "mute microphone": lambda: (speak("muting microphone"), subprocess.run(["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "1"])),
     "volume up": lambda: (speak("increasing volume"), subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "+10%"])),
     "volume down": lambda: (speak("increasing volume"), subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])),
@@ -109,11 +109,11 @@ def fuzzy_match_command(text):
         if score > best_score:
             best_score = score
             best_match = (command, action)
-    if best_score > 80:
+    if best_score > 60:
         return best_match
     return None
 speak("Systems online. Awaiting your orders.")
-notify("Sentinel booted and standing by.")
+notify("{AGENT_NAME} booted and standing by.")
 print("Say 'Hey' to activate.\n")
 
 try:

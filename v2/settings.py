@@ -1,6 +1,6 @@
 from pathlib import Path
 
-AGENT_NAME="Jarvis"
+AGENT_NAME="bhu2"
 
 MODEL_PATH = Path("~/dev/vosk/vosk-model-small-en-us-0.15").expanduser()
 PIPER_MODEL="libritts"
