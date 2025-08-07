@@ -13,9 +13,9 @@
 - [x] logging
 - [ ] screenshot explainer
 - [ ] contextual understanding
-- [ ] execute commands
-- [ ] vision
+- [x] execute commands
+- [ ] vision (llava maybe)
 - [ ] automate everything
-- [ ] voice in (maybe vosk)
-- [x] voice out (maybe kokoro or zonos) (or better, espeak)
-- [ ] custom voice in espeak
+- [x] voice in (~maybe~ vosk)
+- [x] voice out (~maybe kokoro or zonos~) through piper-tts
+- [ ] custom voice in ~espeak~ piper-tts
