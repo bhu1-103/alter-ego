@@ -7,7 +7,7 @@
 
 `ollama pull llama3.2:1b`. works on literally any computer
 
-`vosk` - download any model from [here](https://alphacephei.com/vosk/models). [40 mb model](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip) is good enough for everyday scenarios
+`vosk` - download any model from [here](https://alphacephei.com/vosk/models). [the 40 mb model](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip) is good enough for everyday scenarios
 
 `piper voices` can be downloaded from [here](https://huggingface.co/rhasspy/piper-voices/tree/main). you need both the `.onnx` and `.onnx.json` files
 
@@ -17,14 +17,16 @@
 
 - [x] clipboard explainer
 - [x] logging
-- [ ] screenshot explainer
-- [ ] contextual understanding
-- [x] execute commands
-- [ ] vision (llava maybe)
-- [x] automate everything (done partially, but the framework is ready)
 - [x] voice in (~maybe~ vosk)
 - [x] voice out (~maybe kokoro or zonos~) through piper-tts
 - [x] custom voice in ~espeak~ piper-tts
+- [x] execute commands
+- [x] automate everything (done partially, but the framework is ready)
+- [ ] screenshot explainer
+- [ ] contextual understanding
+- [ ] logging of commands to make it smarter
+- [ ] vision (llava maybe)
+
 
 ## user manual
 
