@@ -28,10 +28,16 @@
 
 ## user manual
 
-### settings.py
+### settings.py **YOU MUST RESTART THE RUNTIME FOR THE CHANGES TO AFFECT**
 
 - set your vosk [model path](https://github.com/bhu1-103/alter-ego?tab=readme-ov-file#dependencies) using `MODEL_PATH`
 
 - set your [piper model path](https://github.com/bhu1-103/alter-ego?tab=readme-ov-file#dependencies) using `PIPER_MODEL`
 
 - i use the development version of piper, so i have set a `PIPER_PATH` variable
+
+- you can set the `AGENT_NAME` variable to anything, though it's not being used in the current version
+
+- `wake words` can be changed to anything else, i used `hey` for now
+
+- similarly `wake_responses` and `dont_understand_responses` can be changed, they're taken in random order
