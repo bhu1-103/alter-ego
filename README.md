@@ -1,11 +1,15 @@
 # bhu3, my alter ego
 
-## .Dependencies
+## Dependencies
 `sudo pacman -S curl dunst`
 
 `curl -fsSL https://ollama.com/install.sh | sh`
 
 `ollama pull llama3.2:1b`. works on literally any computer
+
+`piper-tts`
+
+`pip install -r requirements.txt`
 
 ## improvements
 
@@ -15,7 +19,8 @@
 - [ ] contextual understanding
 - [x] execute commands
 - [ ] vision (llava maybe)
-- [ ] automate everything
+- [x] automate everything (done partially, but the framework is ready)
 - [x] voice in (~maybe~ vosk)
 - [x] voice out (~maybe kokoro or zonos~) through piper-tts
-- [ ] custom voice in ~espeak~ piper-tts
+- [x] custom voice in ~espeak~ piper-tts
+
