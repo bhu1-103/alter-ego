@@ -41,3 +41,12 @@
 - `wake words` can be changed to anything else, i used `hey` for now
 
 - similarly `wake_responses` and `dont_understand_responses` can be changed, they're taken in random order
+
+### live-command.py
+
+- edit the commands here from `commands`. here is the basic syntax. `"command string": lambda: (speak("Voice feedback"), notify("Notification text"), subprocess.Popen(["program", "arg1", "arg2"]))`
+
+1. `command string` -> the thing you wanna say after the wake word
+2. `Voice feedback` -> what you want your assistant to reply for this specific command
+3. `Notification text` -> currently works in linux only. self explanatory
+4. `program` -> let's say you want to open youtube in firefox, all you have to do is `firefox https://youtube.com`. that translates to `subprocess.run(["firefox", "youtube.com"])`
