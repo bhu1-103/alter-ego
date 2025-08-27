@@ -106,7 +106,7 @@ commands = {
     "shut up": lambda: speak("okay, i'll shut up"),
     "shut the fuck up": lambda: speak("okay, i'll shut the fuck up"),
     "power off": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])),
-    "shutdown": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])),
+    "shutdown now": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])), #preventing confusion with shut up
     "lock screen": lambda: (speak("locking the screen"), send2vita("locking the screen"), subprocess.run(["swaylock"])),
     "today": lambda: (speak("today is "+subprocess.getoutput("date '+%A, %B %d'")), notify("today is"+subprocess.getoutput("date"))),
     "files": lambda: (speak("opening file explorer"), send2vita("opening file explorer"), subprocess.run(["nautilus"])),
