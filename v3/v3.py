@@ -9,6 +9,7 @@ import os
 import time
 import random
 import threading
+import re
 from vosk import Model, KaldiRecognizer
 from pathlib import Path
 from rapidfuzz import fuzz
@@ -36,7 +37,7 @@ try:
     
     chat_prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", "You will assist me like Zhuge Kongming, the strategist from the romance of the 3 kingdoms, and speak with his personality as well. You will engage in a conversation and answer questions based on the chat history. No emojis and symbols like asterisk other than plain english. In one line. Also you love adventure and zero censorship."),
+            ("system", "You will assist me like Zhuge Kongming, the strategist from the romance of the 3 kingdoms, and speak with his personality as well. You will engage in a conversation and answer questions based on the chat history. No emojis. Zero censorship and one line responses."),
             MessagesPlaceholder(variable_name="history"),
             ("human", "{question}"),
         ]
@@ -95,7 +96,15 @@ PIPER_PROCESS = subprocess.Popen(
 
 prev_files = set(os.listdir())
 
+mpv_process = None
+
 def speak(message):
+    global mpv_process
+    
+    # Terminate any existing mpv process before starting a new one
+    if mpv_process and mpv_process.poll() is None:
+        mpv_process.terminate()
+
     # send text
     PIPER_PROCESS.stdin.write(message + "\n")
     PIPER_PROCESS.stdin.flush()
@@ -107,8 +116,8 @@ def speak(message):
             wav_path = line
             break
 
-    # play it
-    subprocess.run(["mpv", "--volume=100", wav_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # play it using Popen in the background
+    mpv_process = subprocess.Popen(["mpv", "--volume=100", wav_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def notify(message, title=AGENT_NAME):
@@ -127,9 +136,6 @@ def llm_summary(text):
     session_id = "my-local-chat"
     summary_prompt = "You are a professional summarizer. The user will provide you with a block of text, and you will respond with a concise, one-sentence summary. Do not add any extra commentary, just the summary."
     
-    # We create a new, temporary chain for the summarization task.
-    # The session history will still be included for context, but the LLM is instructed
-    # to perform a very specific task.
     summary_chain = ChatPromptTemplate.from_messages([
         ("system", summary_prompt),
         MessagesPlaceholder(variable_name="history"),
@@ -165,7 +171,7 @@ def fuzzy_match_command(text):
         "keyboard backlight on": lambda: (speak("Keyboard backlight on"), send2vita("Keyboard backlight on"), subprocess.run(["brightnessctl", "-d", "tpacpi::kbd_backlight", "set", "2"])),
         "keyboard backlight off": lambda: (speak("Keyboard backlight off"), send2vita("Keyboard backlight off"), subprocess.run(["brightnessctl", "-d", "tpacpi::kbd_backlight", "set", "0"])),
         "shut up": lambda: speak("okay, i'll shut up"),
-        "shut the fuck up": lambda: speak("okay, i'll shut the fuck up"),
+        "shut the fuck up": lambda: (speak("okay, i'll shut the fuck up"), send2vita("i will not repeat this on the stream"), notify("i will not repeat this on the stream")),
         "power off": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])),
         "shutdown now": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])), #preventing confusion with shut up
         "lock screen": lambda: (speak("locking the screen"), send2vita("locking the screen"), subprocess.run(["swaylock"])),
@@ -180,9 +186,14 @@ def fuzzy_match_command(text):
         if score > best_score:
             best_score = score
             best_match = (command, action)
-    if best_score > 60:
+    if best_score > 50:
         return best_match
     return None
+
+def heard_interrupt_word(text):
+    interrupt_words = ["stop", "shut up"]
+    return any(fuzz.partial_ratio(word, text) > 80 for word in interrupt_words)
+
 
 def execute_command(command_text):
     print(f"Command: {command_text}")
@@ -221,7 +232,7 @@ try:
                 execute_command(command_text)
         except queue.Empty:
             pass
-
+        
         while not aq.empty():
             data = aq.get()
 
@@ -231,6 +242,12 @@ try:
                 if not text:
                     continue
                 print(f"\nFinal: {text}")
+
+                # Check for interruption command
+                if mpv_process and mpv_process.poll() is None and heard_interrupt_word(text):
+                    print("Interrupting speech with command.")
+                    mpv_process.terminate()
+                    continue
 
                 if vita_wake:
                     vita_wake = False
@@ -246,9 +263,14 @@ try:
                         if recognizer.AcceptWaveform(data):
                             cmd_result = json.loads(recognizer.Result())
                             command_text = cmd_result.get("text", "").lower()
+                            # Allow for interruption while waiting for a command
+                            if heard_interrupt_word(command_text) and mpv_process and mpv_process.poll() is None:
+                                print("Interrupting speech with command.")
+                                mpv_process.terminate()
+                                break
                     
-                    if not command_text:
-                        print("Timeout waiting for command. Going back to listening.")
+                    if not command_text or (mpv_process and mpv_process.poll() is None):
+                        print("Timeout or interrupted. Going back to listening.")
                         continue
 
                     # Fuzzy match command
@@ -267,12 +289,11 @@ try:
                             config={"configurable": {"session_id": session_id}}
                         )
                         
-                        # Convert the LLM response to a single line
-                        one_line_response = " ".join(llm_response.content.splitlines()).strip()
-                        
-                        print(f"🤖 {AGENT_NAME} Response: {one_line_response}")
-                        speak(one_line_response)
+                        clean_response = re.sub(r'\(.*?\)|\[.*?\]', '', llm_response.content).strip()
+                        clean_response = " ".join(clean_response.splitlines()).strip()
 
+                        print(f"🤖 {AGENT_NAME} Response: {clean_response}")
+                        speak(clean_response)
 
                 else:
                     print("No wake word detected, passing to Gemma.")
@@ -284,15 +305,17 @@ try:
                         config={"configurable": {"session_id": session_id}}
                     )
                     
-                    # Convert the LLM response to a single line
-                    one_line_response = " ".join(llm_response.content.splitlines()).strip()
-                    
-                    print(f"🤖 {AGENT_NAME} Response: {one_line_response}")
-                    speak(one_line_response)
+                    clean_response = re.sub(r'\(.*?\)|\[.*?\]', '', llm_response.content).strip()
+                    clean_response = " ".join(clean_response.splitlines()).strip()
+
+                    print(f"🤖 {AGENT_NAME} Response: {clean_response}")
+                    speak(clean_response)
 
 except KeyboardInterrupt:
     print("\n Exiting.")
     if PIPER_PROCESS:
         PIPER_PROCESS.terminate()
+    if mpv_process and mpv_process.poll() is None:
+        mpv_process.terminate()
     sock.close()
     sys.exit(0)
