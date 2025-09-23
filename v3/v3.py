@@ -243,7 +243,7 @@ try:
                     match = fuzzy_match_command(text)
                     if match:
                         command, action = match
-                        print(f"✅ Matched: {command}")
+                        print(f"Matched: {command}")
                         action()
                     else:
                         print("No match found for command, passing to LLM.")
