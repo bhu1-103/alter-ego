@@ -1,4 +1,4 @@
-# updates from v3 (spoiler alert: it's huge)
+# updates from v3 (spoiler alert: it's huge) (DELETE THIS)
 
 - live voice session with LLM is now possible. (arigato **[lang-chan](https://www.langchain.com/)**)
 
