@@ -5,6 +5,7 @@ import socket
 import queue
 import json
 import subprocess
+import requests
 import os
 import time
 import random
@@ -59,70 +60,65 @@ PIPER_PROCESS = subprocess.Popen(
 prev_files = set(os.listdir())
 
 def speak(message):
-    # send text
     PIPER_PROCESS.stdin.write(message + "\n")
     PIPER_PROCESS.stdin.flush()
 
-    # read lines until we get one ending in .wav
     while True:
         line = PIPER_PROCESS.stdout.readline().strip()
         if line.endswith(".wav"):
             wav_path = line
             break
-
-    # play it
-    subprocess.run(["mpv", "--volume=100", wav_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    #playit
+    subprocess.Popen(["mpv", "--volume=100", wav_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def notify(message, title=AGENT_NAME):
-    subprocess.run(["makoctl", "dismiss"])
-    subprocess.run(["notify-send", title, message])
+    #subprocess.Popen(["makoctl", "dismiss"]) #Wayland only
+    subprocess.Popen(["notify-send", title, message])
 
 def send2vita(str):
     #send_sock.sendto(message.encode("utf-8"),(UDP_IP,UDP_PORT))
     print("placeholder function")
 
 commands = {
-    "open firefox": lambda: (speak("Opening firefox"), send2vita("Opening firefox"), notify("Opening Firefox"), subprocess.Popen(["firefox"])),
+    "open browser": lambda: (speak("Opening browser"), send2vita("Opening browser"), notify("Opening browser"), subprocess.Popen(["zen-browser"])),
     "open discord": lambda: (speak("Opening discord"), send2vita("Opening discord"), notify("Opening discord"), subprocess.Popen(["discord"])),
     "open terminal": lambda: (speak("Opening terminal"), send2vita("Opening terminal"), notify("Opening terminal"), subprocess.Popen(["kitty"])),
-    "take a screenshot": lambda: (speak("taking screenshot"), send2vita("taking screenshot"), notify("screenshot taken"), subprocess.Popen(["grim"])),
-    "play music": lambda: (speak("Playing music"), send2vita("Playing music"), notify("Playing music"), subprocess.run(["mpc", "play"])),
-    "toggle music": lambda: (speak("Pausing music"), send2vita("Pausing music"), notify("toggling music"), subprocess.run(["mpc", "toggle"])),
-    "stop music": lambda: (speak("Stopping music"), send2vita("Stopping music"), notify("Stopping music"), subprocess.run(["mpc", "pause"])),
-    "next song": lambda: (speak("playing next music track"), send2vita("playing next music track"), notify("playing next song"), subprocess.run(["mpc", "next"])),
-    "skip song": lambda: (speak("playing next music track"), send2vita("playing next music track"), notify("playing next song"), subprocess.run(["mpc", "next"])),
-    "previous song": lambda: (speak("playing previous music track"), send2vita("playing previous music track"), notify("playing previous song"), subprocess.run(["mpc", "prev"])),
+    "take a screenshot": lambda: (speak("taking screenshot"), send2vita("taking screenshot"), notify("screenshot taken"), subprocess.Popen(["maim"])),
+    "play music": lambda: (speak("Playing music"), send2vita("Playing music"), notify("Playing music"), subprocess.Popen(["mpc", "play"])),
+    "toggle music": lambda: (speak("Pausing music"), send2vita("Pausing music"), notify("toggling music"), subprocess.Popen(["mpc", "toggle"])),
+    "stop music": lambda: (speak("Stopping music"), send2vita("Stopping music"), notify("Stopping music"), subprocess.Popen(["mpc", "pause"])),
+    "next song": lambda: (speak("playing next music track"), send2vita("playing next music track"), notify("playing next song"), subprocess.Popen(["mpc", "next"])),
+    "skip song": lambda: (speak("playing next music track"), send2vita("playing next music track"), notify("playing next song"), subprocess.Popen(["mpc", "next"])),
+    "previous song": lambda: (speak("playing previous music track"), send2vita("playing previous music track"), notify("playing previous song"), subprocess.Popen(["mpc", "prev"])),
     "show calendar": lambda: (speak("Here is your calendar"), send2vita("Here is your calendar"), notify(subprocess.getoutput("cal"))),
     "what time is it": lambda: (speak("The time now is"), send2vita("The time now is"), notify(subprocess.getoutput("date"))),
-    "open youtube": lambda: (speak("Opening youtube"), send2vita("Opening youtube"), notify("opening youtube"),subprocess.run(["firefox", "youtube.com"])),
-    "selection": lambda: ((lambda summary: [notify(summary, "selected text summary"),speak(summary)])(llm_summary(subprocess.getoutput("wl-paste -p")))),
-    "mute microphone": lambda: (speak("muting microphone"), send2vita("muting microphone"), subprocess.run(["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "1"])),
-    "volume up": lambda: (speak("increasing volume"), send2vita("increasing volume"), subprocess.run(["mpc", "volume", "+10"])),
-    "volume down": lambda: (speak("decreasing volume"), send2vita("decreasing volume"), subprocess.run(["mpc", "volume", "-10"])),
-    "volume mute": lambda: (speak("muting music"), send2vita("muting music"), subprocess.run(["pactl", "set-sink-mute", "@DEFAULT_SINK@", "1"])),
-    "keyboard backlight on": lambda: (speak("Keyboard backlight on"), send2vita("Keyboard backlight on"), subprocess.run(["brightnessctl", "-d", "tpacpi::kbd_backlight", "set", "2"])),
-    "keyboard backlight off": lambda: (speak("Keyboard backlight off"), send2vita("Keyboard backlight off"), subprocess.run(["brightnessctl", "-d", "tpacpi::kbd_backlight", "set", "0"])),
+    "open youtube": lambda: (speak("Opening youtube"), send2vita("Opening youtube"), notify("opening youtube"),subprocess.Popen(["zen-browser", "youtube.com"])),
+    "selection": lambda: ((lambda summary: [notify(summary, "selected text summary"),speak(summary)])(llm_summary(subprocess.getoutput("xclip -selection clipboard -o")))),
+    "mute microphone": lambda: (speak("muting microphone"), send2vita("muting microphone"), subprocess.Popen(["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "1"])),
+    "volume up": lambda: (speak("increasing volume"), send2vita("increasing volume"), subprocess.Popen(["mpc", "volume", "+10"])),
+    "volume down": lambda: (speak("decreasing volume"), send2vita("decreasing volume"), subprocess.Popen(["mpc", "volume", "-10"])),
+    "volume mute": lambda: (speak("muting music"), send2vita("muting music"), subprocess.Popen(["pactl", "set-sink-mute", "@DEFAULT_SINK@", "1"])),
+    "keyboard backlight on": lambda: (speak("Keyboard backlight on"), send2vita("Keyboard backlight on"), subprocess.Popen(["brightnessctl", "-d", "tpacpi::kbd_backlight", "set", "2"])),
+    "keyboard backlight off": lambda: (speak("Keyboard backlight off"), send2vita("Keyboard backlight off"), subprocess.Popen(["brightnessctl", "-d", "tpacpi::kbd_backlight", "set", "0"])),
     "shut up": lambda: speak("okay, i'll shut up"),
     "shut the fuck up": lambda: speak("okay, i'll shut the fuck up"),
-    "power off": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])),
-    "shutdown now": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.run(["shutdown", "now"])), #preventing confusion with shut up
-    "lock screen": lambda: (speak("locking the screen"), send2vita("locking the screen"), subprocess.run(["swaylock"])),
+    "power off": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.Popen(["shutdown", "now"])),
+    "shutdown": lambda: (speak("sayonara"), send2vita("sayonara"), notify("shutting down"), subprocess.Popen(["shutdown", "now"])),
+    "lock screen": lambda: (speak("locking the screen"), send2vita("locking the screen"), subprocess.Popen(["/home/bhu1/dev/bin/lock.sh"])),
     "today": lambda: (speak("today is "+subprocess.getoutput("date '+%A, %B %d'")), notify("today is"+subprocess.getoutput("date"))),
-    "files": lambda: (speak("opening file explorer"), send2vita("opening file explorer"), subprocess.run(["nautilus"])),
-    "open obs studio": lambda: (speak("opening obs studio"), send2vita("opening obs studio"), notify("opening obs studio"), subprocess.run(["obs"])),
+    "files": lambda: (speak("opening file explorer"), send2vita("opening file explorer"), subprocess.Popen(["nautilus"])),
+    "open obs studio": lambda: (speak("opening obs studio"), send2vita("opening obs studio"), notify("opening obs studio"), subprocess.Popen(["obs"])),
 }
 
 def heard_wake_word(text):
-    return any(fuzz.partial_ratio(word,text)>80 for word in wake_words)
+    return any(fuzz.token_sort_ratio(word,text)>80 for word in wake_words)
 
 def llm_summary(text):
-    import requests
-    import json
     response = requests.post(
         "http://localhost:11434/api/generate",
         data=json.dumps({
-            "model": "llama3.2:1b",
+            "model": "qwen2.5:0.5b",
             "prompt": f"Explain this in one sentence:\n\n{text}",
             "stream": False
         })
@@ -133,7 +129,10 @@ def fuzzy_match_command(text):
     best_match = None
     best_score = 0
     for command, action in commands.items():
-        score = fuzz.ratio(command, text)
+        score = max(
+                0.6 * fuzz.partial_ratio(command, text),
+                0.4 * fuzz.token_sort_ratio(command, text)
+        )
         if score > best_score:
             best_score = score
             best_match = (command, action)
